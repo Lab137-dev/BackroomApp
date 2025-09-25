@@ -16,8 +16,9 @@
   .topbar{display:flex;align-items:center;gap:10px;margin-bottom:10px}
   .logo{display:flex;align-items:center;gap:8px;font-weight:800;letter-spacing:.3px}
   .logo svg{width:24px;height:24px}
-  .tabs{display:flex;gap:6px;margin-left:auto}
+  .tabs{display:flex;gap:6px;margin-left:auto;flex-wrap:wrap}
   .tab{background:linear-gradient(180deg,var(--panel),var(--panel-2));border:1px solid var(--line);padding:8px 10px;border-radius:10px;color:var(--ink);cursor:pointer}
+  .tab[hidden]{display:none}
   .tab.active{outline:2px solid var(--accent);}
   .panel{background:linear-gradient(180deg,var(--panel),rgba(22,32,69,.7));border:1px solid var(--line);border-radius:14px;padding:12px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
   .grid{display:grid;gap:10px}
@@ -25,8 +26,9 @@
   .grid.cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}
   .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
   .spacer{flex:1}
-  input,select,button{font-size:15px}
-  input[type="number"],input[type="text"],select{background:#0f1630;border:1px solid var(--line);color:var(--ink);padding:10px 10px;border-radius:10px;outline:none;min-height:40px}
+  input,select,button,textarea{font-size:15px}
+  input[type="number"],input[type="text"],select,textarea{background:#0f1630;border:1px solid var(--line);color:var(--ink);padding:10px 10px;border-radius:10px;outline:none;min-height:40px}
+  textarea{width:100%;min-height:80px;resize:vertical}
   button{background:linear-gradient(180deg,#1a2550,#14204a);border:1px solid var(--line);color:var(--ink);padding:10px;border-radius:12px;cursor:pointer;min-height:40px}
   button:hover{filter:brightness(1.05)}
   .hint{color:var(--muted);font-size:12px}
@@ -86,6 +88,8 @@
       <div class="tab active" data-tab="pallets">Pallets</div>
       <div class="tab" data-tab="staff">Staffing</div>
       <div class="tab" data-tab="audit">Audit</div>
+      <div class="tab" data-tab="backstock">Back Stock</div>
+      <div class="tab" data-tab="eod">EOD</div>
       <div class="tab" data-tab="reports">Reports</div>
     </div>
   </div>
@@ -95,13 +99,17 @@
     <div class="section-title">
       <span>Pallet Tracking</span>
       <span class="spacer"></span>
-      <span class="hint">Type cycles: Standard → 2-Wave → 4-Wave</span>
+      <button id="startDayBtn" title="Mark shift start">Start Day</button>
+      <button id="endDayBtn" title="Open End of Day">End Day</button>
+      <span class="pill" id="shiftBadge" title="Shift window" style="display:none"></span>
     </div>
     <div class="row">
       <label class="hint">How many pallets?</label>
       <input id="palletCount" type="number" min="0" max="12" step="1" value="3" />
       <button id="setupPallets">Setup</button>
       <button id="clearPallets" title="Remove saved pallets">Clear</button>
+      <span class="spacer"></span>
+      <span class="hint">Type cycles: Standard → 2-Wave → 4-Wave</span>
     </div>
     <div id="palletGrid" class="grid cols-3" style="margin-top:10px"></div>
 
@@ -185,6 +193,122 @@
     <div id="auditLog" style="margin-top:10px" class="grid"></div>
   </section>
 
+  <!-- BACK STOCK -->
+  <section class="panel" id="tab-backstock" hidden>
+    <div class="section-title">
+      <span>Back Stock</span>
+      <span class="spacer"></span>
+      <span class="hint">Store by department; apparel pallets auto→totes (×32)</span>
+    </div>
+    <div class="grid cols-2">
+      <div class="card">
+        <div class="title">New Entry</div>
+        <div class="row" style="margin-top:6px">
+          <label class="hint">Category</label>
+          <select id="bsCategory" class="spacer">
+            <option>Home</option>
+            <option>Beauty</option>
+            <option>Apparel</option>
+            <option>Furniture</option>
+            <option>Luggage</option>
+          </select>
+        </div>
+        <div class="row">
+          <label class="hint">Department #</label>
+          <input id="bsDept" type="text" placeholder="e.g., 602 Kitchen" class="spacer">
+        </div>
+        <div class="row">
+          <label class="hint">Unit</label>
+          <select id="bsUnit" class="spacer">
+            <option>Pieces</option>
+            <option>Totes</option>
+            <option>Bins</option>
+            <option>Pallets</option>
+          </select>
+          <label class="hint">Quantity</label>
+          <input id="bsQty" type="number" min="0" value="0" style="width:130px">
+        </div>
+        <div class="row">
+          <label class="hint">Description</label>
+          <input id="bsDesc" type="text" placeholder="Short description..." class="spacer">
+        </div>
+        <div class="row">
+          <span class="spacer"></span>
+          <button id="bsAdd">Add</button>
+          <button id="bsClear">Clear All</button>
+        </div>
+        <div id="bsInfo" class="hint" style="margin-top:6px"></div>
+      </div>
+      <div class="card">
+        <div class="title">By Department</div>
+        <div id="bsList" style="margin-top:6px" class="grid"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EOD -->
+  <section class="panel" id="tab-eod" hidden>
+    <div class="section-title">
+      <span>End of Day</span>
+      <span class="spacer"></span>
+      <button id="eodShare">Share</button>
+      <button id="eodCopy">Copy</button>
+      <button id="eodExport">Export JSON</button>
+    </div>
+
+    <div class="grid cols-2">
+      <div class="card" id="eodMetricsCard">
+        <div class="title">Metrics</div>
+        <div id="eodMetrics" class="sub" style="margin-top:6px;white-space:pre-wrap"></div>
+      </div>
+      <div class="card">
+        <div class="title">Ready to Go to Floor</div>
+        <div class="row" style="margin-top:6px">
+          <label class="hint">Department</label>
+          <select id="floorDept" class="spacer">
+            <option>Kitchen</option>
+            <option>Beauty</option>
+            <option>Mens Acc</option>
+            <option>Mens Apparel</option>
+            <option>Women's Apparel</option>
+            <option>Kids Apparel</option>
+            <option>Intiments</option>
+            <option>Toys</option>
+            <option>Mens</option>
+            <option>Women's</option>
+            <option>Active</option>
+          </select>
+        </div>
+        <div class="row">
+          <label class="hint">Unit</label>
+          <select id="floorUnit" class="spacer">
+            <option>Totes</option>
+            <option>Bins</option>
+            <option>Racks</option>
+            <option>Pieces</option>
+          </select>
+          <label class="hint">Quantity</label>
+          <input id="floorQty" type="number" min="0" value="0" style="width:130px">
+        </div>
+        <div class="row">
+          <label class="hint">Notes / Comments</label>
+          <textarea id="floorNotes" placeholder="Notes..."></textarea>
+        </div>
+        <div class="row">
+          <span class="spacer"></span>
+          <button id="floorAdd">Add Entry</button>
+          <button id="floorClear">Clear All</button>
+        </div>
+        <div id="floorList" class="grid" style="margin-top:8px"></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:10px">
+      <div class="title">Compiled End of Day Report</div>
+      <div id="eodText" style="white-space:pre-wrap;margin-top:6px"></div>
+    </div>
+  </section>
+
   <!-- REPORTS -->
   <section class="panel" id="tab-reports" hidden>
     <div class="section-title"><span>Reports</span><span class="spacer"></span><button id="exportBtn">Export JSON</button><input id="importFile" type="file" accept="application/json" hidden /><button id="importBtn">Import JSON</button></div>
@@ -213,6 +337,8 @@ const sections = {
   pallets: document.getElementById('tab-pallets'),
   staff: document.getElementById('tab-staff'),
   audit: document.getElementById('tab-audit'),
+  backstock: document.getElementById('tab-backstock'),
+  eod: document.getElementById('tab-eod'),
   reports: document.getElementById('tab-reports')
 };
 document.getElementById('tabs').addEventListener('click', (e)=>{
@@ -222,11 +348,17 @@ document.getElementById('tabs').addEventListener('click', (e)=>{
   const tab = t.dataset.tab;
   for(const [k,sec] of Object.entries(sections)) sec.hidden = (k!==tab);
   if(tab==='reports') renderReport();
+  if(tab==='eod') renderEOD();
 });
 
 /*************** Helpers ***************/
 function el(html){ const t=document.createElement('template'); t.innerHTML=html.trim(); return t.content.firstChild; }
 function fmtSecs(s){ const m=Math.floor(s/60), ss=(s%60).toString().padStart(2,'0'); return `${m}:${ss}` }
+function fmtHM(totalSeconds){
+  const h = Math.floor(totalSeconds/3600);
+  const m = Math.floor((totalSeconds%3600)/60);
+  return `${h}h ${m}m`;
+}
 function ring(percent){
   const size=parseInt(getComputedStyle(document.documentElement).getPropertyValue('--ring-size')||'50')||50;
   const stroke=6, r=(size-stroke)/2, c=2*Math.PI*r, off=c*(1-Math.max(0,Math.min(1,percent)));
@@ -236,13 +368,13 @@ const ROLE_ICON = { Unloading:'📦', Sorting:'🔀', Hanging:'👗', Processing
 const ROLE_BADGE = { Unloading:'role-unload', Sorting:'role-sort', Hanging:'role-hang', Processing:'role-proc' };
 
 /*************** Web Audio (chimes) ***************/
-const AudioBus = (()=> {
+const AudioBus = (()=>{
   let ctx, gain;
   function ensure(){
     if(!ctx){ ctx = new (window.AudioContext||window.webkitAudioContext)(); gain = ctx.createGain(); gain.gain.value = Number(DB.load('vol','0.8')); gain.connect(ctx.destination); }
   }
   function setVolume(v){ ensure(); gain.gain.value=v; DB.save('vol', String(v)); }
-  function beep(seq){ // seq: [{f,d}] in Hz & seconds
+  function beep(seq){
     ensure(); if(DB.load('mute', false)) return;
     let t = ctx.currentTime;
     seq.forEach(({f=880,d=0.15})=>{
@@ -255,7 +387,7 @@ const AudioBus = (()=> {
       t += d + 0.05;
     });
   }
-  function chimeBreak(escalated=false){ // single vs double
+  function chimeBreak(escalated=false){
     const base = [{f:988,d:0.12},{f:1319,d:0.12}];
     beep(escalated? base.concat(base) : base);
   }
@@ -275,9 +407,35 @@ async function notify(title, body){
   }catch{}
 }
 
+/*************** Shift / EOD storage ***************/
+let shift = DB.load('shift', { startTime:null, endTime:null });
+let eod = DB.load('eod', { floor:[], lastReportText:"" });
+
+function setShiftStart(ts=Date.now()){
+  shift.startTime = shift.startTime || ts;
+  DB.save('shift', shift);
+  paintShiftBadge();
+}
+function setShiftEnd(ts=Date.now()){
+  shift.endTime = ts;
+  DB.save('shift', shift);
+}
+function clearShift(){ shift = { startTime:null, endTime:null }; DB.save('shift', shift); paintShiftBadge(); }
+function paintShiftBadge(){
+  const b = document.getElementById('shiftBadge');
+  if(shift.startTime){
+    const s = new Date(shift.startTime).toLocaleTimeString();
+    const e = shift.endTime ? new Date(shift.endTime).toLocaleTimeString() : '…';
+    b.textContent = `Shift: ${s} – ${e}`;
+    b.style.display = '';
+  }else{
+    b.style.display = 'none';
+  }
+}
+
 /*************** Pallets ***************/
 const palletTypes = ["Standard","2-Wave","4-Wave"];
-const palletDefaults = { type:"Standard", duration: 15*60, remaining: 15*60, cartons:0, status:"Not Started", startedAt:null, complete:false, overdue:false, overdueSince:null };
+const palletDefaults = { type:"Standard", duration: 15*60, remaining: 15*60, cartons:0, status:"Not Started", startedAt:null, complete:false, overdue:false, overdueSince:null, completedAt:null };
 const palletGrid = document.getElementById('palletGrid');
 let pallets = DB.load('pallets', []);
 let palletTimers = new Map();
@@ -325,7 +483,6 @@ function makePallet(i, data){
       AudioBus.chimePallet(false); notify('Pallet overdue', `Pallet #${id+1} is overdue`);
     } else if(p.overdue){
       const overSec = Math.floor((Date.now()-p.overdueSince)/1000);
-      if(overSec===300){ /* 5m */ /* visual already pulses via CSS */ }
       if(overSec!==0 && overSec%120===0){ AudioBus.chimePallet(false); } // repeat every 2m
       if(overSec===600){ AudioBus.chimePallet(true); } // 10m double
     }
@@ -334,10 +491,24 @@ function makePallet(i, data){
   function startTimer(){ stopTimer(); palletTimers.set(id, setInterval(tick, 1000)); }
   function stopTimer(){ const t=palletTimers.get(id); if(t){ clearInterval(t); palletTimers.delete(id);} }
 
-  card.querySelector('.startBtn').addEventListener('click', ()=>{ if(p.status==='Not Started'){ p.status='In Progress'; p.startedAt=Date.now(); startTimer(); save(); paint(); }});
+  card.querySelector('.startBtn').addEventListener('click', ()=>{
+    if(p.status==='Not Started'){
+      p.status='In Progress'; p.startedAt=Date.now();
+      // mark shift start at first pallet start if not set
+      setShiftStart(p.startedAt);
+      startTimer(); save(); paint();
+    }
+  });
   card.querySelector('.cartonBtn').addEventListener('click', ()=>{ p.cartons++; paint(); save(); });
   card.querySelector('.typeBtn').addEventListener('click', ()=>{ const idx = palletTypes.indexOf(p.type); p.type = palletTypes[(idx+1)%palletTypes.length]; paint(); save(); });
-  card.querySelector('.completeBtn').addEventListener('click', ()=>{ p.complete=true; p.status='Complete'; p.overdue=false; stopTimer(); paint(); save(); });
+  card.querySelector('.completeBtn').addEventListener('click', ()=>{
+    if(!p.complete){
+      p.complete=true; p.status='Complete'; p.overdue=false; p.completedAt = Date.now();
+      stopTimer(); paint(); save();
+      // if all pallets that exist are completed, open EOD
+      setTimeout(checkAllPalletsComplete, 150);
+    }
+  });
 
   function save(){ pallets[id]=p; DB.save('pallets', pallets);} 
   paint();
@@ -356,7 +527,7 @@ const staffGrid = document.getElementById('staffGrid');
 const breakLimitSecs = 15*60; // 15m
 const lunchLimitSecs = 45*60; // 45m
 const PRESETS = ["Alex","Danny","Riley-L","Jada","Jaden","Aiden","Hannah","Zena","April","Carrissa (OTN)","Ok"];
-let staff = DB.load('staff', []); // each: { name, status, breakElapsed, lunchElapsed, overdue, role, sub, overdueSince }
+let staff = DB.load('staff', []); // { name, status, breakElapsed, lunchElapsed, overdue, role, sub, overdueSince }
 let staffTimers = new Map();
 
 function roleEmoji(role){ return ROLE_ICON[role]||'•'; }
@@ -421,7 +592,6 @@ function makeStaff(i, data){
     const pct = Math.min(1, elapsed/lim);
     card.querySelector('.ring').outerHTML = ring(pct);
     card.classList.toggle('overdue', !!s.overdue);
-    // role & sub
     roleText.textContent = s.role;
     card.querySelector('.role-badge').className = 'role-badge ' + roleBadge(s.role);
     card.querySelector('.role-emoji').textContent = roleEmoji(s.role);
@@ -436,11 +606,10 @@ function makeStaff(i, data){
     if(s.status==='Break'){ s.breakElapsed++; if(s.breakElapsed>breakLimitSecs){ onOverdue(); }}
     else if(s.status==='Lunch'){ s.lunchElapsed++; if(s.lunchElapsed>lunchLimitSecs){ onOverdue(); }}
     else { s.overdue=false; s.overdueSince=null; }
-    // escalation + repeats
     if(s.overdue && s.overdueSince){
       const overSec = Math.floor((Date.now()-s.overdueSince)/1000);
-      if(overSec!==0 && overSec%120===0){ AudioBus.chimeBreak(false); } // repeat every 2m
-      if(overSec===600){ AudioBus.chimeBreak(true); } // 10m double
+      if(overSec!==0 && overSec%120===0){ AudioBus.chimeBreak(false); }
+      if(overSec===600){ AudioBus.chimeBreak(true); }
     }
     paint(); save();
   },1000)); }
@@ -449,7 +618,6 @@ function makeStaff(i, data){
     if(!s.overdue){ s.overdue=true; s.overdueSince=Date.now(); AudioBus.chimeBreak(false); notify('Break/Lunch overdue', `${s.name} • ${s.status}`); }
   }
 
-  // Tap card cycles
   card.addEventListener('click', (e)=>{
     if(e.target.closest('button')|| e.target.closest('select')|| e.target===nameEl) return;
     if(s.status==='Working'){ s.status='Break'; s.overdue=false; s.overdueSince=null; start(); }
@@ -458,14 +626,13 @@ function makeStaff(i, data){
     paint(); save();
   });
 
-  // Buttons
-  resetBtn.addEventListener('click', (e)=>{ e.stopPropagation(); s.breakElapsed=0; s.lunchElapsed=0; s.overdue=false; s.overdueSince=null; if(s.status!=='Working'){ /* keep running */ } paint(); save(); });
+  resetBtn.addEventListener('click', (e)=>{ e.stopPropagation(); s.breakElapsed=0; s.lunchElapsed=0; s.overdue=false; s.overdueSince=null; paint(); save(); });
   breakBtn.addEventListener('click', (e)=>{ e.stopPropagation(); s.status='Break'; s.overdue=false; s.overdueSince=null; s.breakElapsed=0; start(); paint(); save(); });
   lunchBtn.addEventListener('click', (e)=>{ e.stopPropagation(); s.status='Lunch'; s.overdue=false; s.overdueSince=null; s.lunchElapsed=0; start(); paint(); save(); });
   renameBtn.addEventListener('click', (e)=>{ e.stopPropagation(); openNameModal(s.name, (newName)=>{ s.name=newName||s.name; nameEl.textContent=s.name; paint(); save(); }); });
 
-  roleSel.addEventListener('change', (e)=>{ s.role = roleSel.value; if(s.role!=='Processing'){ s.sub=''; subSel.value=""; } subSel.style.display = s.role==='Processing' ? '' : 'none'; paint(); save(); });
-  subSel.addEventListener('change', (e)=>{ s.sub = subSel.value || ''; paint(); save(); });
+  roleSel.addEventListener('change', ()=>{ s.role = roleSel.value; if(s.role!=='Processing'){ s.sub=''; subSel.value=""; } subSel.style.display = s.role==='Processing' ? '' : 'none'; paint(); save(); });
+  subSel.addEventListener('change', ()=>{ s.sub = subSel.value || ''; paint(); save(); });
 
   paint();
   return card;
@@ -536,6 +703,245 @@ auditRecordBtn.addEventListener('click', ()=>{ const entry = { pallet_id: 1, cat
 undoAuditBtn.addEventListener('click', ()=>{ audits.pop(); DB.save('audits', audits); renderAudit(); });
 function renderAudit(){ auditLog.innerHTML = ''; if(audits.length===0){ auditLog.appendChild(el(`<div class="hint">No audit records yet.</div>`)); return; } [...audits].reverse().forEach((a)=>{ auditLog.appendChild(el(`<div class="card"><div class="row"><div class="title">${a.category} • ${a.subcategory}</div><span class="spacer"></span><span class="pill">x${a.count}</span></div><div class="sub">${new Date(a.timestamp).toLocaleString()}</div></div>`)); }); }
 
+/*************** Back Stock ***************/
+let backstock = DB.load('backstock', []); // {category, dept, unit, qty, desc, totesEq, timestamp}
+const bsCategory = document.getElementById('bsCategory');
+const bsDept = document.getElementById('bsDept');
+const bsUnit = document.getElementById('bsUnit');
+const bsQty = document.getElementById('bsQty');
+const bsDesc = document.getElementById('bsDesc');
+const bsAdd = document.getElementById('bsAdd');
+const bsClear = document.getElementById('bsClear');
+const bsList = document.getElementById('bsList');
+const bsInfo = document.getElementById('bsInfo');
+
+function renderBackstock(){
+  bsList.innerHTML='';
+  if(backstock.length===0){ bsList.appendChild(el(`<div class="hint">No back stock yet.</div>`)); bsInfo.textContent=''; return; }
+  // group by department
+  const map = new Map();
+  backstock.forEach(e=>{
+    const k = e.dept.trim()||'(no dept)';
+    if(!map.has(k)) map.set(k, []);
+    map.get(k).push(e);
+  });
+  Array.from(map.entries()).sort().forEach(([dept, entries])=>{
+    const totalLine = (()=> {
+      // show small totals by unit within dept
+      const unitTotals = {};
+      entries.forEach(e=>{ unitTotals[e.unit]=(unitTotals[e.unit]||0)+e.qty; });
+      const parts = Object.entries(unitTotals).map(([u,q])=>`${q} ${u.toLowerCase()}`);
+      return parts.join(' • ') || '';
+    })();
+    const card = el(`<div class="card"><div class="row"><div class="title">Dept ${dept}</div><span class="spacer"></span><span class="sub">${totalLine}</span></div></div>`);
+    entries.forEach(e=>{
+      const line = `${e.category} — ${e.qty} ${e.unit.toLowerCase()}${e.unit==='Pallets' && e.category==='Apparel' ? ` (≈ ${e.totesEq} totes)` : ''}${e.desc? ' • '+e.desc:''}`;
+      card.appendChild(el(`<div class="sub">${new Date(e.timestamp).toLocaleTimeString()} — ${line}</div>`));
+    });
+    bsList.appendChild(card);
+  });
+  // top info
+  const apparelPallets = backstock.filter(e=>e.category==='Apparel' && e.unit==='Pallets').reduce((a,b)=>a+b.qty,0);
+  const totesEq = apparelPallets*32;
+  bsInfo.textContent = apparelPallets? `Apparel pallets: ${apparelPallets} → approx ${totesEq} totes` : '';
+}
+bsAdd?.addEventListener('click', ()=>{
+  const entry = {
+    category: bsCategory.value,
+    dept: (bsDept.value||'').trim(),
+    unit: bsUnit.value,
+    qty: Math.max(0, parseInt(bsQty.value||'0',10)),
+    desc: (bsDesc.value||'').trim(),
+    totesEq: (bsCategory.value==='Apparel' && bsUnit.value==='Pallets') ? Math.max(0, parseInt(bsQty.value||'0',10))*32 : 0,
+    timestamp: new Date().toISOString()
+  };
+  backstock.push(entry); DB.save('backstock', backstock);
+  bsQty.value = '0'; bsDesc.value = '';
+  renderBackstock();
+});
+bsClear?.addEventListener('click', ()=>{
+  if(confirm('Clear all back stock entries?')){ backstock=[]; DB.save('backstock', backstock); renderBackstock(); }
+});
+
+/*************** EOD (End of Day) ***************/
+const startDayBtn = document.getElementById('startDayBtn');
+const endDayBtn = document.getElementById('endDayBtn');
+const eodText = document.getElementById('eodText');
+const eodMetrics = document.getElementById('eodMetrics');
+const eodShareBtn = document.getElementById('eodShare');
+const eodCopyBtn = document.getElementById('eodCopy');
+const eodExportBtn = document.getElementById('eodExport');
+
+const floorDept = document.getElementById('floorDept');
+const floorUnit = document.getElementById('floorUnit');
+const floorQty = document.getElementById('floorQty');
+const floorNotes = document.getElementById('floorNotes');
+const floorAdd = document.getElementById('floorAdd');
+const floorClear = document.getElementById('floorClear');
+const floorList = document.getElementById('floorList');
+
+function checkAllPalletsComplete(){
+  const have = DB.load('pallets', []);
+  if(have.length>0 && have.every(p=>p.complete)){
+    openEOD();
+  }
+}
+function openEOD(){
+  // set end time if missing
+  if(!shift.startTime) setShiftStart();
+  setShiftEnd();
+  // switch tab
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  const tabBtn = document.querySelector('.tab[data-tab="eod"]');
+  tabBtn.classList.add('active');
+  for(const [k,sec] of Object.entries(sections)) sec.hidden = (k!=='eod');
+  renderEOD();
+}
+startDayBtn.addEventListener('click', ()=>{ setShiftStart(); alert('Shift started.'); });
+endDayBtn.addEventListener('click', ()=> openEOD());
+
+floorAdd?.addEventListener('click', ()=>{
+  const entry = { dept: floorDept.value, unit: floorUnit.value, qty: Math.max(0, parseInt(floorQty.value||'0',10)), notes: floorNotes.value.trim(), timestamp: new Date().toISOString() };
+  eod.floor.push(entry); DB.save('eod', eod); floorQty.value='0'; floorNotes.value=''; renderEODFloor();
+});
+floorClear?.addEventListener('click', ()=>{ if(confirm('Clear all floor-ready entries?')){ eod.floor=[]; DB.save('eod', eod); renderEODFloor(); } });
+
+function renderEODFloor(){
+  floorList.innerHTML='';
+  if(eod.floor.length===0){ floorList.appendChild(el(`<div class="hint">No floor-ready entries yet.</div>`)); return; }
+  [...eod.floor].reverse().forEach(f=>{
+    floorList.appendChild(el(`<div class="card"><div class="row"><div class="title">${f.dept}</div><span class="spacer"></span><span class="pill">${f.qty} ${f.unit.toLowerCase()}</span></div><div class="sub">${new Date(f.timestamp).toLocaleString()}${f.notes? ' • '+f.notes:''}</div></div>`));
+  });
+}
+
+function computeManHours(shiftSeconds){
+  // Approximate man-hours = sum over staff of (shiftSeconds - break - lunch)
+  const people = DB.load('staff', []);
+  let total = 0;
+  people.forEach(s=>{
+    const breaks = Number(s.breakElapsed||0);
+    const lunches = Number(s.lunchElapsed||0);
+    const work = Math.max(0, shiftSeconds - breaks - lunches);
+    total += work;
+  });
+  return total; // seconds
+}
+
+function palletsPerHourBuckets(pall){
+  // bucket completions by hour of day
+  const buckets = {};
+  pall.filter(p=>p.completedAt).forEach(p=>{
+    const d = new Date(p.completedAt);
+    const key = d.toLocaleString([], { hour:'numeric', hour12:true });
+    buckets[key] = (buckets[key]||0)+1;
+  });
+  return buckets; // { "2 PM": n, ...}
+}
+
+function buildEODText(metrics){
+  const {start, finish, durationS, palletsDone, manHoursS, avgPerPalletS, mostHour, leastHour, buckets} = metrics;
+  const lines = [];
+  lines.push(`END OF DAY REPORT`);
+  lines.push(`Date: ${new Date().toLocaleDateString()}`);
+  lines.push(`Shift: ${start} – ${finish}`);
+  lines.push(`Pallets completed: ${palletsDone}`);
+  lines.push(`Total duration: ${fmtHM(durationS)}`);
+  lines.push(`Man-hours: ${(manHoursS/3600).toFixed(2)} h`);
+  lines.push(`Average time per pallet: ${avgPerPalletS>0? fmtHM(avgPerPalletS) : 'N/A'}`);
+  lines.push(`Most productive hour: ${mostHour || 'N/A'}`);
+  lines.push(`Least productive hour: ${leastHour || 'N/A'}`);
+  lines.push('');
+  lines.push(`Ready to Floor:`);
+  if(eod.floor.length===0) lines.push(`  (none)`);
+  else eod.floor.forEach(f=> lines.push(`  • ${f.dept}: ${f.qty} ${f.unit.toLowerCase()}${f.notes? ' — '+f.notes:''}`));
+  lines.push('');
+  lines.push(`Back Stock Summary (by department):`);
+  const bs = DB.load('backstock', []);
+  if(bs.length===0){ lines.push(`  (none)`); }
+  else{
+    const grouped = {};
+    bs.forEach(e=>{
+      const k = e.dept.trim()||'(no dept)';
+      if(!grouped[k]) grouped[k] = [];
+      grouped[k].push(e);
+    });
+    Object.keys(grouped).sort().forEach(k=>{
+      const unitTotals = {};
+      grouped[k].forEach(e=> unitTotals[e.unit]=(unitTotals[e.unit]||0)+e.qty);
+      const parts = Object.entries(unitTotals).map(([u,q])=>`${q} ${u.toLowerCase()}`);
+      lines.push(`  • Dept ${k}: ${parts.join(', ')}`);
+    });
+  }
+  lines.push('');
+  lines.push(`Pallets/hour breakdown:`);
+  const keys = Object.keys(buckets);
+  if(keys.length===0) lines.push(`  (no completions recorded)`);
+  else keys.sort((a,b)=> new Date('1970-01-01 '+a) - new Date('1970-01-01 '+b)).forEach(k=> lines.push(`  • ${k}: ${buckets[k]}`));
+  return lines.join('\n');
+}
+
+function renderEOD(){
+  paintShiftBadge();
+
+  const startS = shift.startTime ? new Date(shift.startTime) : new Date();
+  const endS = shift.endTime ? new Date(shift.endTime) : new Date();
+  const durationS = Math.max(0, Math.floor((endS - startS)/1000));
+  const pall = DB.load('pallets', []);
+  const palletsDone = pall.filter(p=>p.complete).length;
+  const manHoursS = computeManHours(durationS);
+  const avgPerPalletS = palletsDone>0 ? Math.floor(durationS / palletsDone) : 0;
+  const buckets = palletsPerHourBuckets(pall);
+  // most/least productive hours
+  let mostHour=null, leastHour=null, max=-1, min=Infinity;
+  for(const [k,v] of Object.entries(buckets)){
+    if(v>max){ max=v; mostHour=k; }
+    if(v<min){ min=v; leastHour=k; }
+  }
+  const metrics = {
+    start: shift.startTime ? startS.toLocaleTimeString() : '(not set)',
+    finish: shift.endTime ? endS.toLocaleTimeString() : '(not set)',
+    durationS, palletsDone, manHoursS, avgPerPalletS, mostHour, leastHour, buckets
+  };
+  const metricsText =
+`Start: ${metrics.start}
+Finish: ${metrics.finish}
+Duration: ${fmtHM(durationS)}
+Pallets Completed: ${palletsDone}
+Man-hours: ${(manHoursS/3600).toFixed(2)} h
+Average per Pallet: ${avgPerPalletS>0? fmtHM(avgPerPalletS) : 'N/A'}
+Most Productive Hour: ${mostHour || 'N/A'}
+Least Productive Hour: ${leastHour || 'N/A'}`;
+  eodMetrics.textContent = metricsText;
+
+  renderEODFloor();
+
+  const text = buildEODText(metrics);
+  eodText.textContent = text;
+  eod.lastReportText = text;
+  DB.save('eod', eod);
+}
+
+eodShareBtn?.addEventListener('click', async ()=>{
+  const text = eod.lastReportText || eodText.textContent || '';
+  if(navigator.share){
+    try{ await navigator.share({ title:'EOD Report', text }); }catch{}
+  }else{
+    try{ await navigator.clipboard.writeText(text); alert('Copied EOD to clipboard (no native share available).'); }catch{ alert('Copy failed.'); }
+  }
+});
+eodCopyBtn?.addEventListener('click', async ()=>{
+  try{ await navigator.clipboard.writeText(eod.lastReportText||eodText.textContent||''); alert('Copied EOD to clipboard.'); }catch{ alert('Copy failed.'); }
+});
+eodExportBtn?.addEventListener('click', ()=>{
+  const payload = {
+    generatedAt: new Date().toISOString(),
+    shift, pallets: DB.load('pallets', []), staff: DB.load('staff', []),
+    backstock: DB.load('backstock', []), floor: eod.floor, eodText: eod.lastReportText
+  };
+  const blob = new Blob([ JSON.stringify(payload, null, 2) ], {type:'application/json'});
+  const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href=url; a.download='eod-report.json'; a.click(); URL.revokeObjectURL(url);
+});
+
 /*************** Reports ***************/
 const reportText = document.getElementById('reportText');
 const exportBtn = document.getElementById('exportBtn');
@@ -545,11 +951,24 @@ function renderReport(){
   const pallets = DB.load('pallets', []);
   const audits = DB.load('audits', []);
   const staff = DB.load('staff', []);
+  const backstock = DB.load('backstock', []);
+  const bsGrouped = {};
+  backstock.forEach(e=>{
+    const k = e.dept.trim()||'(no dept)';
+    if(!bsGrouped[k]) bsGrouped[k] = {};
+    bsGrouped[k][e.unit] = (bsGrouped[k][e.unit]||0) + e.qty;
+  });
+  const bsLines = Object.keys(bsGrouped).sort().map(d=>{
+    const parts = Object.entries(bsGrouped[d]).map(([u,q])=>`${q} ${u.toLowerCase()}`);
+    return `Dept ${d}: ${parts.join(', ')}`;
+  });
+
   const rpt = [
     `Report generated on ${new Date().toISOString()}`,
     `Total Pallets: ${pallets.length}`,
     `Total Audits: ${audits.length}`,
     `Total Staff Entries: ${staff.length}`,
+    `Back Stock Dept Count: ${Object.keys(bsGrouped).length}`,
     '',
     '— Pallets —',
     ...pallets.map((p,i)=>`#${i+1} ${p.type} • ${p.status}${p.overdue?' (Overdue)':''} • Cartons ${p.cartons} • Remaining ${fmtSecs(p.remaining)}`),
@@ -558,13 +977,34 @@ function renderReport(){
     ...audits.slice(-10).map(a=>`${new Date(a.timestamp).toLocaleString()} — ${a.category} / ${a.subcategory} x${a.count}`),
     '',
     '— Staff —',
-    ...staff.map(s=>`${s.name} — ${s.status}${s.overdue?' (Overdue)':''} ${s.status==='Break'? '(Break '+fmtSecs(s.breakElapsed)+')' : s.status==='Lunch'? '(Lunch '+fmtSecs(s.lunchElapsed)+')' : ''} • ${s.role}${s.sub? ' / '+s.sub:''}`)
+    ...staff.map(s=>`${s.name} — ${s.status}${s.overdue?' (Overdue)':''} ${s.status==='Break'? '(Break '+fmtSecs(s.breakElapsed)+')' : s.status==='Lunch'? '(Lunch '+fmtSecs(s.lunchElapsed)+')' : ''} • ${s.role}${s.sub? ' / '+s.sub:''}`),
+    '',
+    '— Back Stock (by Department) —',
+    ...(bsLines.length? bsLines : ['(none)']),
+    '',
+    '— Last End of Day Summary —',
+    (DB.load('eod', {lastReportText:""}).lastReportText || '(none)')
   ].join('\n');
   reportText.textContent = rpt;
 }
-exportBtn.addEventListener('click', ()=>{ const blob = new Blob([ JSON.stringify({ pallets:DB.load('pallets',[]), audits:DB.load('audits',[]), staff:DB.load('staff',[]) }, null, 2) ], {type:'application/json'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href=url; a.download='backroom-data.json'; a.click(); URL.revokeObjectURL(url); });
+exportBtn.addEventListener('click', ()=>{ const blob = new Blob([ JSON.stringify({ pallets:DB.load('pallets',[]), audits:DB.load('audits',[]), staff:DB.load('staff',[]), backstock:DB.load('backstock',[]), shift:DB.load('shift',{}), eod:DB.load('eod',{}) }, null, 2) ], {type:'application/json'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href=url; a.download='backroom-data.json'; a.click(); URL.revokeObjectURL(url); });
 importBtn.addEventListener('click', ()=> importFile.click());
-importFile.addEventListener('change', ()=>{ const f = importFile.files[0]; if(!f) return; const rd = new FileReader(); rd.onload = ()=>{ try{ const obj = JSON.parse(rd.result); if(obj.pallets) DB.save('pallets', obj.pallets); if(obj.audits) DB.save('audits', obj.audits); if(obj.staff) DB.save('staff', obj.staff); pallets = DB.load('pallets', []); staff = DB.load('staff', []); audits = DB.load('audits', []); renderPallets(); renderStaff(); renderAudit(); renderReport(); }catch(e){ alert('Invalid file.'); } }; rd.readAsText(f); });
+importFile.addEventListener('change', ()=>{
+  const f = importFile.files[0]; if(!f) return;
+  const rd = new FileReader();
+  rd.onload = ()=>{ try{
+    const obj = JSON.parse(rd.result);
+    if(obj.pallets) DB.save('pallets', obj.pallets);
+    if(obj.audits) DB.save('audits', obj.audits);
+    if(obj.staff) DB.save('staff', obj.staff);
+    if(obj.backstock) DB.save('backstock', obj.backstock);
+    if(obj.shift) DB.save('shift', obj.shift);
+    if(obj.eod) DB.save('eod', obj.eod);
+    pallets = DB.load('pallets', []); staff = DB.load('staff', []); audits = DB.load('audits', []); backstock = DB.load('backstock', []); shift = DB.load('shift', shift); eod = DB.load('eod', eod);
+    renderPallets(); renderStaff(); renderAudit(); renderBackstock(); paintShiftBadge(); renderReport();
+  }catch(e){ alert('Invalid file.'); } };
+  rd.readAsText(f);
+});
 
 /*************** Controls wiring ***************/
 document.getElementById('filterRole').addEventListener('change', renderStaff);
@@ -573,7 +1013,7 @@ document.getElementById('compactToggle').addEventListener('change', (e)=>{ docum
 document.getElementById('addEmp').addEventListener('click', ()=>{ setStaffCount(staff.length+1); document.getElementById('empCount').value = staff.length; });
 document.getElementById('removeEmp').addEventListener('click', ()=>{ setStaffCount(staff.length-1); document.getElementById('empCount').value = staff.length; });
 document.getElementById('empCount').addEventListener('change', (e)=>{ setStaffCount(parseInt(e.target.value||'1',10)); e.target.value = staff.length; });
-document.getElementById('applyPreset').addEventListener('click', ()=>{ const name = document.getElementById('presetSelect').value; // assign next unnamed or append new
+document.getElementById('applyPreset').addEventListener('click', ()=>{ const name = document.getElementById('presetSelect').value;
   const idx = staff.findIndex(s=>s.name.startsWith('Employee '));
   if(idx>=0){ staff[idx].name = name; } else { staff.push({ name, status:'Working', breakElapsed:0, lunchElapsed:0, overdue:false, overdueSince:null, role:'Unloading', sub:'' }); }
   DB.save('staff', staff); setStaffCount(Math.min(10, staff.length)); renderStaff();
@@ -597,6 +1037,10 @@ function boot(){
   renderStaff();
   // Audit
   initAuditSelectors(); renderAudit();
+  // Backstock
+  renderBackstock();
+  // Shift badge
+  paintShiftBadge();
 }
 boot();
 </script>
