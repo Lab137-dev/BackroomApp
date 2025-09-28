@@ -5,13 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
 <title>Backroom Ops — Mobile</title>
 <style>
+  /* palette: deep red accents, clean neutrals */
   :root{
-    --bg:#0b1020; --panel:#111935; --panel-2:#162045; --ink:#eaf0ff; --muted:#b7c2e8; --line:#3a4a7a;
-    --accent:#6aa6ff; --good:#63e27a; --warn:#ffd24a; --bad:#ff6b6b; --info:#7bd8ff;
-    --role-unload:#15c0b0; --role-sort:#4ea2ff; --role-hang:#b266ff; --role-proc:#ffcc55;
+    --bg:#0c0f16; --panel:#111827; --panel-2:#0f1726; --ink:#f5f7fb; --muted:#c7cfdd; --line:#2b364a;
+    --accent:#b5121b; --good:#1fcc7b; --warn:#ffcc4d; --bad:#e02626; --info:#7bd8ff;
+    --role-unload:#15c0b0; --role-sort:#4ea2ff; --role-hang:#b266ff; --role-proc:#ffcc55; --role-push:#b5121b;
   }
   html,body{height:100%;}
-  body{margin:0;background:radial-gradient(1200px 1200px at 10% 0%,#131c3a 0%,var(--bg) 60%);color:var(--ink);font:15px/1.45 system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;}
+  body{margin:0;background:radial-gradient(1200px 1200px at 10% 0%,#0f1524 0%,var(--bg) 60%);color:var(--ink);font:15px/1.45 system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;}
   .app{max-width:900px;margin:0 auto;padding:12px;}
   .topbar{display:flex;align-items:center;gap:10px;margin-bottom:10px}
   .logo{display:flex;align-items:center;gap:8px;font-weight:800;letter-spacing:.3px}
@@ -27,17 +28,16 @@
   .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
   .spacer{flex:1}
   input,select,button,textarea{font-size:15px}
-  input[type="number"],input[type="text"],select,textarea{background:#0f1630;border:1px solid var(--line);color:var(--ink);padding:10px 10px;border-radius:10px;outline:none;min-height:40px}
+  input[type="number"],input[type="text"],select,textarea{background:#0e1626;border:1px solid var(--line);color:var(--ink);padding:10px 10px;border-radius:10px;outline:none;min-height:40px}
   textarea{width:100%;min-height:80px;resize:vertical}
-  button{background:linear-gradient(180deg,#1a2550,#14204a);border:1px solid var(--line);color:var(--ink);padding:10px;border-radius:12px;cursor:pointer;min-height:40px}
+  button{background:linear-gradient(180deg,#1b2336,#121b2d);border:1px solid var(--line);color:var(--ink);padding:10px;border-radius:12px;cursor:pointer;min-height:40px}
   button:hover{filter:brightness(1.05)}
   .hint{color:var(--muted);font-size:12px}
-  .tag{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border-radius:999px;border:1px solid var(--line);background:#0e183a;font-size:12px}
   .pill{padding:4px 10px;border-radius:999px;background:#0e183a;border:1px solid var(--line)}
   .section-title{display:flex;align-items:center;gap:8px;margin:4px 0 10px 0;font-weight:700}
   .section-title svg{width:18px;height:18px}
 
-  .card{background:linear-gradient(180deg,#121d3f,#0d142e);border:1px solid var(--line);padding:10px;border-radius:14px;position:relative;overflow:hidden}
+  .card{background:linear-gradient(180deg,#131b2c,#0d1424);border:1px solid var(--line);padding:10px;border-radius:14px;position:relative;overflow:hidden}
   .card .title{font-weight:700}
   .sub{font-size:12px;color:var(--muted)}
   .role-badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:3px 8px;border-radius:999px;border:1px solid var(--line)}
@@ -45,6 +45,7 @@
   .role-sort{background:rgba(78,162,255,.18);color:#cfe4ff}
   .role-hang{background:rgba(178,102,255,.18);color:#eed9ff}
   .role-proc{background:rgba(255,204,85,.18);color:#fff2cc}
+  .role-push{background:rgba(181,18,27,.18);color:#ffd6d8}
   .role-emoji{font-size:14px}
 
   .status{font-weight:700}
@@ -54,8 +55,8 @@
   .s-overdue{color:var(--bad)}
   .blink{animation:blink 1s steps(2,end) infinite}
   @keyframes blink{50%{opacity:.35}}
-  .card.overdue{border-color:var(--bad); box-shadow:0 0 0 0 rgba(255,107,107,.6); animation:pulseRed 1s infinite}
-  @keyframes pulseRed{0%{box-shadow:0 0 0 0 rgba(255,107,107,.6)} 70%{box-shadow:0 0 0 10px rgba(255,107,107,0)} 100%{box-shadow:0 0 0 0 rgba(255,107,107,0)}}
+  .card.overdue{border-color:var(--bad); box-shadow:0 0 0 0 rgba(224,38,38,.7); animation:pulseRed 0.75s infinite}
+  @keyframes pulseRed{0%{box-shadow:0 0 0 0 rgba(224,38,38,.7)} 70%{box-shadow:0 0 0 14px rgba(224,38,38,0)} 100%{box-shadow:0 0 0 0 rgba(224,38,38,0)}}
 
   .ring{--size:50; --stroke:6; width:var(--size)px;height:var(--size)px}
   .ring svg{transform:rotate(-90deg)}
@@ -80,7 +81,7 @@
 <div class="app">
   <div class="topbar">
     <div class="logo" title="Backroom Ops">
-      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 7h18M5 7v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7" stroke="#7bd8ff" stroke-width="1.5"/><rect x="7" y="3" width="10" height="4" rx="1" stroke="#6aa6ff" stroke-width="1.5"/><path d="M9 11h6m-6 4h4" stroke="#9ad1ff" stroke-width="1.5"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 7h18M5 7v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7" stroke="#ffb3b6" stroke-width="1.5"/><rect x="7" y="3" width="10" height="4" rx="1" stroke="#ff9096" stroke-width="1.5"/><path d="M9 11h6m-6 4h4" stroke="#ffd2d5" stroke-width="1.5"/></svg>
       <span>Backroom Ops</span>
       <span class="pill">Mobile</span>
     </div>
@@ -105,7 +106,8 @@
     </div>
     <div class="row">
       <label class="hint">How many pallets?</label>
-      <input id="palletCount" type="number" min="0" max="12" step="1" value="3" />
+      <!-- default 0 pallets -->
+      <input id="palletCount" type="number" min="0" max="12" step="1" value="0" />
       <button id="setupPallets">Setup</button>
       <button id="clearPallets" title="Remove saved pallets">Clear</button>
       <span class="spacer"></span>
@@ -114,7 +116,7 @@
     <div id="palletGrid" class="grid cols-3" style="margin-top:10px"></div>
 
     <div class="row" style="margin-top:8px">
-      <div class="tag">Pallet chime: separate sound • Mute/Volume in Staffing</div>
+      <div class="pill">Pallet alert: harsh klaxon • Mute/Volume in Staffing</div>
     </div>
   </section>
 
@@ -132,26 +134,26 @@
     <div class="controls" style="margin-bottom:8px">
       <div class="row thin">
         <label class="hint">Employees (1–10)</label>
-        <input id="empCount" type="number" min="1" max="10" value="6" class="thin"/>
+        <input id="empCount" type="number" min="1" max="10" value="1" class="thin"/>
         <button id="addEmp">Add</button>
         <button id="removeEmp">Remove</button>
       </div>
       <div class="row thin">
-        <select id="presetSelect" class="spacer">
-          <option>Alex</option><option>Danny</option><option>Riley-L</option><option>Jada</option>
-          <option>Jaden</option><option>Aiden</option><option>Hannah</option><option>Zena</option>
-          <option>April</option><option>Carrissa (OTN)</option><option>Ok</option>
-        </select>
+        <select id="presetSelect" class="spacer"></select>
         <button id="applyPreset">Name next</button>
+        <button id="editPresets">Edit list</button>
       </div>
       <div class="row thin">
         <label class="hint">Role filter</label>
         <select id="filterRole" class="spacer">
           <option value="">All roles</option>
-          <option>Unloading</option><option>Sorting</option><option>Hanging</option><option>Processing</option>
+          <option>Unloading</option><option>Sorting</option><option>Hanging</option><option>Processing</option><option>Pushing</option>
         </select>
       </div>
       <div class="row thin">
+  <div class="row thin">
+    <button id="resetWorkTimes">Reset Work Times</button>
+  </div>
         <label class="hint">Sub-task</label>
         <select id="filterSub" class="spacer">
           <option value="">All sub-tasks</option>
@@ -169,12 +171,12 @@
       <div class="row">
         <label class="row" style="gap:6px"><input type="checkbox" id="muteToggle"> Mute</label>
         <label>Volume <input type="range" id="volSlider" min="0" max="1" step="0.01" value="0.8"></label>
-        <button id="testBreak">Test Break Chime</button>
-        <button id="testPallet">Test Pallet Chime</button>
+        <button id="testBreak">Test Break Alert</button>
+        <button id="testPallet">Test Pallet Alert</button>
       </div>
       <div class="row">
-        <span class="tag">Break 15m • Lunch 45m</span>
-        <span class="tag">Escalation: 5m pulse • 10m double-chime</span>
+        <span class="pill">Break 15m • Lunch 45m</span>
+        <span class="pill">Escalation: 5m pulse • 10m long klaxon</span>
       </div>
     </div>
 
@@ -272,7 +274,7 @@
             <option>Mens Apparel</option>
             <option>Women's Apparel</option>
             <option>Kids Apparel</option>
-            <option>Intiments</option>
+            <option>Intimates</option>
             <option>Toys</option>
             <option>Mens</option>
             <option>Women's</option>
@@ -325,6 +327,16 @@
   </div>
 </div>
 
+<!-- Modal: edit presets -->
+<div class="modal" id="presetsModal">
+  <div class="sheet">
+    <div class="section-title"><span>Edit Quick Fill List</span></div>
+    <div class="sub">One name per line:</div>
+    <div class="row"><textarea id="presetsInput" class="spacer" style="min-height:180px"></textarea></div>
+    <div class="row" style="margin-top:12px"><span class="spacer"></span><button id="presetsCancel">Cancel</button><button id="presetsSave">Save</button></div>
+  </div>
+</div>
+
 <script>
 /*************** Local DB ***************/
 const DB = {
@@ -362,39 +374,37 @@ function fmtHM(totalSeconds){
 function ring(percent){
   const size=parseInt(getComputedStyle(document.documentElement).getPropertyValue('--ring-size')||'50')||50;
   const stroke=6, r=(size-stroke)/2, c=2*Math.PI*r, off=c*(1-Math.max(0,Math.min(1,percent)));
-  return `<div class="ring"><svg width="${size}" height="${size}"><circle cx="${size/2}" cy="${size/2}" r="${r}" stroke="#223067" stroke-width="${stroke}" fill="none"/><circle cx="${size/2}" cy="${size/2}" r="${r}" stroke="#7bd8ff" stroke-width="${stroke}" stroke-linecap="round" fill="none" stroke-dasharray="${c}" stroke-dashoffset="${off}"/></svg></div>`;
+  return `<div class="ring"><svg width="${size}" height="${size}"><circle cx="${size/2}" cy="${size/2}" r="${r}" stroke="#223067" stroke-width="${stroke}" fill="none"/><circle cx="${size/2}" cy="${size/2}" r="${r}" stroke="#ff9096" stroke-width="${stroke}" stroke-linecap="round" fill="none" stroke-dasharray="${c}" stroke-dashoffset="${off}"/></svg></div>`;
 }
-const ROLE_ICON = { Unloading:'📦', Sorting:'🔀', Hanging:'👗', Processing:'🛠️' };
-const ROLE_BADGE = { Unloading:'role-unload', Sorting:'role-sort', Hanging:'role-hang', Processing:'role-proc' };
+const ROLE_ICON = { Unloading:'📦', Sorting:'🔀', Hanging:'👗', Processing:'🛠️', Pushing:'🛒' };
+const ROLE_BADGE = { Unloading:'role-unload', Sorting:'role-sort', Hanging:'role-hang', Processing:'role-proc', Pushing:'role-push' };
 
-/*************** Web Audio (chimes) ***************/
+/*************** Web Audio (alerts) ***************/
 const AudioBus = (()=>{
   let ctx, gain;
   function ensure(){
     if(!ctx){ ctx = new (window.AudioContext||window.webkitAudioContext)(); gain = ctx.createGain(); gain.gain.value = Number(DB.load('vol','0.8')); gain.connect(ctx.destination); }
   }
   function setVolume(v){ ensure(); gain.gain.value=v; DB.save('vol', String(v)); }
-  function beep(seq){
+  function tone(f=440,d=0.2,type='square',when=0){
+    const o=ctx.createOscillator(), g=ctx.createGain();
+    o.type=type; o.frequency.value=f; o.connect(g); g.connect(gain);
+    g.gain.setValueAtTime(0, when);
+    g.gain.linearRampToValueAtTime(0.9, when+0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001, when+d);
+    o.start(when); o.stop(when+d+0.02);
+  }
+  function klaxon(totalSec=2.5){
     ensure(); if(DB.load('mute', false)) return;
     let t = ctx.currentTime;
-    seq.forEach(({f=880,d=0.15})=>{
-      const o = ctx.createOscillator(); const g = ctx.createGain();
-      o.type='sine'; o.frequency.value=f; o.connect(g); g.connect(gain);
-      g.gain.setValueAtTime(0, t);
-      g.gain.linearRampToValueAtTime(0.9, t+0.01);
-      g.gain.exponentialRampToValueAtTime(0.0001, t+d);
-      o.start(t); o.stop(t+d+0.02);
-      t += d + 0.05;
-    });
+    const end = t + totalSec;
+    while(t<end){
+      tone(420,0.18,'sawtooth',t); t+=0.22;
+      tone(780,0.18,'sawtooth',t); t+=0.22;
+    }
   }
-  function chimeBreak(escalated=false){
-    const base = [{f:988,d:0.12},{f:1319,d:0.12}];
-    beep(escalated? base.concat(base) : base);
-  }
-  function chimePallet(escalated=false){
-    const base = [{f:660,d:0.12},{f:880,d:0.12}];
-    beep(escalated? base.concat(base) : base);
-  }
+  function chimeBreak(escalated=false){ ensure(); if(DB.load('mute', false)) return; if(escalated){ klaxon(3.0); } else { tone(988,0.15,'triangle',ctx.currentTime); tone(1319,0.15,'triangle',ctx.currentTime+0.2); } }
+  function chimePallet(escalated=false){ ensure(); if(DB.load('mute', false)) return; if(escalated){ klaxon(3.0); } else { tone(660,0.15,'sawtooth',ctx.currentTime); tone(880,0.15,'sawtooth',ctx.currentTime+0.22); } }
   function resume(){ ensure(); ctx.resume?.(); }
   return { setVolume, chimeBreak, chimePallet, resume };
 })();
@@ -435,7 +445,7 @@ function paintShiftBadge(){
 
 /*************** Pallets ***************/
 const palletTypes = ["Standard","2-Wave","4-Wave"];
-const palletDefaults = { type:"Standard", duration: 15*60, remaining: 15*60, cartons:0, status:"Not Started", startedAt:null, complete:false, overdue:false, overdueSince:null, completedAt:null };
+const palletDefaults = { type:"Standard", duration: 15*60, remaining: 15*60, cartons:0, pieces:0, status:"Not Started", startedAt:null, complete:false, overdue:false, overdueSince:null, completedAt:null };
 const palletGrid = document.getElementById('palletGrid');
 let pallets = DB.load('pallets', []);
 let palletTimers = new Map();
@@ -448,13 +458,18 @@ function makePallet(i, data){
       ${ring(1 - (p.remaining/p.duration))}
       <div class="spacer">
         <div class="title">Pallet #${id+1} <span class="sub">• <span class="ptype">${p.type}</span></span></div>
-        <div class="sub">Time Left: <span class="tleft">${fmtSecs(p.remaining)}</span> · Cartons: <span class="cartons">${p.cartons}</span></div>
+        <div class="sub">
+          Time Left: <span class="tleft">${fmtSecs(p.remaining)}</span>
+          · <span class="cartonWrap">Cartons: <span class="cartons">${p.cartons}</span></span>
+          · Pieces: <span class="pieces">${p.pieces||0}</span>
+        </div>
         <div class="sub">Status: <span class="status ${p.overdue? 's-overdue blink': p.complete? 's-working' : (p.status==='In Progress'?'s-working':'' )}">${p.overdue? 'Overdue': p.complete? 'Complete': p.status}</span></div>
       </div>
     </div>
     <div class="row" style="margin-top:8px">
       <button class="startBtn">Start</button>
-      <button class="cartonBtn">+1</button>
+      <button class="cartonBtn">+1 Carton</button>
+      <button class="pieceBtn">+1 Piece</button>
       <button class="typeBtn">Type</button>
       <span class="spacer"></span>
       <button class="completeBtn">Complete</button>
@@ -462,29 +477,41 @@ function makePallet(i, data){
   </div>`);
   const tleft = card.querySelector('.tleft');
   const cartonsEl = card.querySelector('.cartons');
+  const piecesEl = card.querySelector('.pieces');
   const statusEl = card.querySelector('.status');
   const ptypeEl = card.querySelector('.ptype');
+  const cartonWrap = card.querySelector('.cartonWrap');
+  const cartonBtn = card.querySelector('.cartonBtn');
 
   function paint(){
     tleft.textContent = fmtSecs(p.remaining);
     cartonsEl.textContent = p.cartons;
+    piecesEl.textContent = p.pieces||0;
     ptypeEl.textContent = p.type;
     statusEl.textContent = p.overdue? 'Overdue' : (p.complete? 'Complete' : p.status);
     statusEl.className = 'status ' + (p.overdue? 's-overdue blink' : p.complete? 's-working' : (p.status==='In Progress'?'s-working':'') );
     const pct = 1 - (p.remaining/p.duration);
     card.querySelector('.ring').outerHTML = ring(pct);
     card.classList.toggle('overdue', !!p.overdue);
+
+    // 2-wave: cartons & pieces; 4-wave: pieces only
+    if(p.type==='4-Wave'){
+      cartonWrap.style.display='none';
+      cartonBtn.style.display='none';
+    }else{
+      cartonWrap.style.display='';
+      cartonBtn.style.display='';
+    }
   }
   function tick(){
     if(p.complete||p.status!=='In Progress') return;
     if(p.remaining>0){ p.remaining = Math.max(0, p.remaining-1); }
     if(p.remaining===0 && !p.overdue){
       p.overdue = true; p.overdueSince = Date.now();
-      AudioBus.chimePallet(false); notify('Pallet overdue', `Pallet #${id+1} is overdue`);
+      AudioBus.chimePallet(true); notify('Pallet overdue', `Pallet #${id+1} is overdue`);
     } else if(p.overdue){
       const overSec = Math.floor((Date.now()-p.overdueSince)/1000);
-      if(overSec!==0 && overSec%120===0){ AudioBus.chimePallet(false); } // repeat every 2m
-      if(overSec===600){ AudioBus.chimePallet(true); } // 10m double
+      if(overSec!==0 && overSec%90===0){ AudioBus.chimePallet(true); } // harsher, more frequent
     }
     paint(); save();
   }
@@ -494,18 +521,17 @@ function makePallet(i, data){
   card.querySelector('.startBtn').addEventListener('click', ()=>{
     if(p.status==='Not Started'){
       p.status='In Progress'; p.startedAt=Date.now();
-      // mark shift start at first pallet start if not set
       setShiftStart(p.startedAt);
       startTimer(); save(); paint();
     }
   });
-  card.querySelector('.cartonBtn').addEventListener('click', ()=>{ p.cartons++; paint(); save(); });
+  cartonBtn.addEventListener('click', ()=>{ p.cartons++; paint(); save(); });
+  card.querySelector('.pieceBtn').addEventListener('click', ()=>{ p.pieces = (p.pieces||0)+1; paint(); save(); });
   card.querySelector('.typeBtn').addEventListener('click', ()=>{ const idx = palletTypes.indexOf(p.type); p.type = palletTypes[(idx+1)%palletTypes.length]; paint(); save(); });
   card.querySelector('.completeBtn').addEventListener('click', ()=>{
     if(!p.complete){
       p.complete=true; p.status='Complete'; p.overdue=false; p.completedAt = Date.now();
       stopTimer(); paint(); save();
-      // if all pallets that exist are completed, open EOD
       setTimeout(checkAllPalletsComplete, 150);
     }
   });
@@ -526,15 +552,21 @@ document.getElementById('clearPallets').addEventListener('click', ()=>{ pallets=
 const staffGrid = document.getElementById('staffGrid');
 const breakLimitSecs = 15*60; // 15m
 const lunchLimitSecs = 45*60; // 45m
-const PRESETS = ["Alex","Danny","Riley-L","Jada","Jaden","Aiden","Hannah","Zena","April","Carrissa (OTN)","Ok"];
-let staff = DB.load('staff', []); // { name, status, breakElapsed, lunchElapsed, overdue, role, sub, overdueSince }
+const DEFAULT_PRESETS = ["Alex","Danny","Riley-L","Jada","Jaden","Aiden","Hannah","Zena","April","Carrissa (OTN)","Ok"];
+let PRESETS = DB.load('presets', DEFAULT_PRESETS);
+let staff = DB.load('staff', []); // { name, status, breakElapsed, lunchElapsed, overdue, role, sub, shiftStart, shiftEnd, overdueSince }
 let staffTimers = new Map();
+
+const presetSelect = document.getElementById('presetSelect');
+function paintPresetSelect(){
+  presetSelect.innerHTML = PRESETS.map(n=>`<option>${n}</option>`).join('');
+}
 
 function roleEmoji(role){ return ROLE_ICON[role]||'•'; }
 function roleBadge(role){ return ROLE_BADGE[role]||''; }
 
 function makeStaff(i, data){
-  const s = { name:`Employee ${i+1}`, status:'Working', breakElapsed:0, lunchElapsed:0, overdue:false, overdueSince:null, role:'Unloading', sub:'', ...data };
+  const s = { name:`Employee ${i+1}`, status:'Working', breakElapsed:0, lunchElapsed:0, overdue:false, overdueSince:null, role:'Unloading', sub:'', shiftStart:null, shiftEnd:null, ...data };
   const card = el(`<div class="card" data-id="${i}">
     <div class="row" style="align-items:center;gap:8px">
       ${ring(0)}
@@ -544,6 +576,7 @@ function makeStaff(i, data){
           <span class="sub">• <span class="status ${cls()}">${label()}</span></span>
         </div>
         <div class="sub">Timer: <span class="timer">0:00</span></div>
+        <div class="sub shiftline" ${s.shiftStart?'':'style="display:none"'}>Work: <span class="shiftSpan"></span></div>
         <div class="row" style="margin-top:4px">
           <span class="role-badge ${roleBadge(s.role)}"><span class="role-emoji">${roleEmoji(s.role)}</span> <span class="roleText">${s.role}</span></span>
           <span class="pill subPill" ${s.role==='Processing' && s.sub ? '' : 'style="display:none"'}>${s.sub||''}</span>
@@ -552,12 +585,15 @@ function makeStaff(i, data){
       <button class="resetBtn" title="Reset timers">Reset</button>
     </div>
     <div class="row" style="margin-top:6px">
+      <button class="startWorkBtn" title="Record start working">Start Work</button>
+      <button class="stopWorkBtn" title="Record stop working">Stop Work</button>
       <button class="breakBtn" title="Start a 15-minute break">Break 15</button>
       <button class="lunchBtn" title="Start a 45-minute lunch">Lunch 45</button>
+      <button class="endBtn" title="End Break/Lunch and return to Working">End</button>
       <button class="renameBtn">Rename</button>
       <span class="spacer"></span>
       <select class="roleSel">
-        <option>Unloading</option><option>Sorting</option><option>Hanging</option><option>Processing</option>
+        <option>Unloading</option><option>Sorting</option><option>Hanging</option><option>Processing</option><option>Pushing</option>
       </select>
       <select class="subSel" ${s.role==='Processing'?'':'style="display:none"'} >
         <option value="">— Sub-task —</option><option>Shoes</option><option>Luggage</option><option>Purses</option><option>Furniture</option>
@@ -570,12 +606,15 @@ function makeStaff(i, data){
   const nameEl = card.querySelector('.empName');
   const breakBtn = card.querySelector('.breakBtn');
   const lunchBtn = card.querySelector('.lunchBtn');
+  const endBtn = card.querySelector('.endBtn');
   const renameBtn = card.querySelector('.renameBtn');
   const resetBtn = card.querySelector('.resetBtn');
   const roleSel = card.querySelector('.roleSel');
   const subSel = card.querySelector('.subSel');
   const roleText = card.querySelector('.roleText');
   const subPill = card.querySelector('.subPill');
+  const shiftLine = card.querySelector('.shiftline');
+  const shiftSpan = card.querySelector('.shiftSpan');
 
   roleSel.value = s.role;
   subSel.value = s.sub || "";
@@ -597,6 +636,14 @@ function makeStaff(i, data){
     card.querySelector('.role-emoji').textContent = roleEmoji(s.role);
     subPill.textContent = s.sub||'';
     subPill.style.display = (s.role==='Processing' && s.sub)? '' : 'none';
+    if(s.shiftStart){
+      const start = new Date(s.shiftStart).toLocaleTimeString();
+      const end = s.shiftEnd ? new Date(s.shiftEnd).toLocaleTimeString() : '…';
+      shiftSpan.textContent = `${start} – ${end}`;
+      shiftLine.style.display = '';
+    }else{
+      shiftLine.style.display = 'none';
+    }
   }
 
   function save(){ staff[i]=s; DB.save('staff', staff); }
@@ -608,16 +655,16 @@ function makeStaff(i, data){
     else { s.overdue=false; s.overdueSince=null; }
     if(s.overdue && s.overdueSince){
       const overSec = Math.floor((Date.now()-s.overdueSince)/1000);
-      if(overSec!==0 && overSec%120===0){ AudioBus.chimeBreak(false); }
-      if(overSec===600){ AudioBus.chimeBreak(true); }
+      if(overSec!==0 && overSec%90===0){ AudioBus.chimeBreak(true); } // harsher and more frequent
     }
     paint(); save();
   },1000)); }
 
   function onOverdue(){
-    if(!s.overdue){ s.overdue=true; s.overdueSince=Date.now(); AudioBus.chimeBreak(false); notify('Break/Lunch overdue', `${s.name} • ${s.status}`); }
+    if(!s.overdue){ s.overdue=true; s.overdueSince=Date.now(); AudioBus.chimeBreak(true); notify('Break/Lunch overdue', `${s.name} • ${s.status}`); }
   }
 
+  // Card click still cycles, but "End" provides explicit stop
   card.addEventListener('click', (e)=>{
     if(e.target.closest('button')|| e.target.closest('select')|| e.target===nameEl) return;
     if(s.status==='Working'){ s.status='Break'; s.overdue=false; s.overdueSince=null; start(); }
@@ -625,6 +672,13 @@ function makeStaff(i, data){
     else { s.status='Working'; s.overdue=false; s.overdueSince=null; stop(); }
     paint(); save();
   });
+
+  // Start/Stop work timestamps
+  card.querySelector('.startWorkBtn').addEventListener('click', (e)=>{ e.stopPropagation(); if(!s.shiftStart){ s.shiftStart = Date.now(); s.shiftEnd = null; paint(); save(); } });
+  card.querySelector('.stopWorkBtn').addEventListener('click', (e)=>{ e.stopPropagation(); if(s.shiftStart){ s.shiftEnd = Date.now(); paint(); save(); } });
+
+  // Explicit end of break/lunch
+  endBtn.addEventListener('click', (e)=>{ e.stopPropagation(); s.status='Working'; s.overdue=false; s.overdueSince=null; stop(); paint(); save(); });
 
   resetBtn.addEventListener('click', (e)=>{ e.stopPropagation(); s.breakElapsed=0; s.lunchElapsed=0; s.overdue=false; s.overdueSince=null; paint(); save(); });
   breakBtn.addEventListener('click', (e)=>{ e.stopPropagation(); s.status='Break'; s.overdue=false; s.overdueSince=null; s.breakElapsed=0; start(); paint(); save(); });
@@ -656,7 +710,7 @@ function setStaffCount(n){
     const start = curr;
     for(let k=0;k<n-curr;k++){
       const name = PRESETS[(start+k)%PRESETS.length] || `Employee ${start+k+1}`;
-      staff.push({ name, status:'Working', breakElapsed:0, lunchElapsed:0, overdue:false, overdueSince:null, role:'Unloading', sub:'' });
+      staff.push({ name, status:'Working', breakElapsed:0, lunchElapsed:0, overdue:false, overdueSince:null, role:'Unloading', sub:'', shiftStart:null, shiftEnd:null });
     }
   }else if(n<curr){
     staff.length = n;
@@ -678,6 +732,24 @@ function openNameModal(curr, cb){
   function cleanup(){ nameSave.removeEventListener('click', onSave); nameCancel.removeEventListener('click', onCancel); document.removeEventListener('keydown', onKey); }
   nameSave.addEventListener('click', onSave); nameCancel.addEventListener('click', onCancel); document.addEventListener('keydown', onKey);
 }
+
+/*************** Presets modal ***************/
+const presetsModal = document.getElementById('presetsModal');
+const presetsInput = document.getElementById('presetsInput');
+const presetsCancel = document.getElementById('presetsCancel');
+const presetsSave = document.getElementById('presetsSave');
+document.getElementById('editPresets').addEventListener('click', ()=>{
+  presetsInput.value = PRESETS.join('\n');
+  presetsModal.style.display='flex';
+});
+presetsCancel.addEventListener('click', ()=>{ presetsModal.style.display='none'; });
+presetsSave.addEventListener('click', ()=>{
+  const list = presetsInput.value.split('\n').map(s=>s.trim()).filter(Boolean);
+  PRESETS = list.length? list : DEFAULT_PRESETS.slice();
+  DB.save('presets', PRESETS);
+  paintPresetSelect();
+  presetsModal.style.display='none';
+});
 
 /*************** Audit ***************/
 const auditCat = document.getElementById('auditCat');
@@ -727,7 +799,6 @@ function renderBackstock(){
   });
   Array.from(map.entries()).sort().forEach(([dept, entries])=>{
     const totalLine = (()=> {
-      // show small totals by unit within dept
       const unitTotals = {};
       entries.forEach(e=>{ unitTotals[e.unit]=(unitTotals[e.unit]||0)+e.qty; });
       const parts = Object.entries(unitTotals).map(([u,q])=>`${q} ${u.toLowerCase()}`);
@@ -740,7 +811,6 @@ function renderBackstock(){
     });
     bsList.appendChild(card);
   });
-  // top info
   const apparelPallets = backstock.filter(e=>e.category==='Apparel' && e.unit==='Pallets').reduce((a,b)=>a+b.qty,0);
   const totesEq = apparelPallets*32;
   bsInfo.textContent = apparelPallets? `Apparel pallets: ${apparelPallets} → approx ${totesEq} totes` : '';
@@ -787,10 +857,8 @@ function checkAllPalletsComplete(){
   }
 }
 function openEOD(){
-  // set end time if missing
   if(!shift.startTime) setShiftStart();
   setShiftEnd();
-  // switch tab
   document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
   const tabBtn = document.querySelector('.tab[data-tab="eod"]');
   tabBtn.classList.add('active');
@@ -815,7 +883,6 @@ function renderEODFloor(){
 }
 
 function computeManHours(shiftSeconds){
-  // Approximate man-hours = sum over staff of (shiftSeconds - break - lunch)
   const people = DB.load('staff', []);
   let total = 0;
   people.forEach(s=>{
@@ -824,18 +891,17 @@ function computeManHours(shiftSeconds){
     const work = Math.max(0, shiftSeconds - breaks - lunches);
     total += work;
   });
-  return total; // seconds
+  return total;
 }
 
 function palletsPerHourBuckets(pall){
-  // bucket completions by hour of day
   const buckets = {};
   pall.filter(p=>p.completedAt).forEach(p=>{
     const d = new Date(p.completedAt);
     const key = d.toLocaleString([], { hour:'numeric', hour12:true });
     buckets[key] = (buckets[key]||0)+1;
   });
-  return buckets; // { "2 PM": n, ...}
+  return buckets;
 }
 
 function buildEODText(metrics){
@@ -891,7 +957,6 @@ function renderEOD(){
   const manHoursS = computeManHours(durationS);
   const avgPerPalletS = palletsDone>0 ? Math.floor(durationS / palletsDone) : 0;
   const buckets = palletsPerHourBuckets(pall);
-  // most/least productive hours
   let mostHour=null, leastHour=null, max=-1, min=Infinity;
   for(const [k,v] of Object.entries(buckets)){
     if(v>max){ max=v; mostHour=k; }
@@ -920,27 +985,6 @@ Least Productive Hour: ${leastHour || 'N/A'}`;
   eod.lastReportText = text;
   DB.save('eod', eod);
 }
-
-eodShareBtn?.addEventListener('click', async ()=>{
-  const text = eod.lastReportText || eodText.textContent || '';
-  if(navigator.share){
-    try{ await navigator.share({ title:'EOD Report', text }); }catch{}
-  }else{
-    try{ await navigator.clipboard.writeText(text); alert('Copied EOD to clipboard (no native share available).'); }catch{ alert('Copy failed.'); }
-  }
-});
-eodCopyBtn?.addEventListener('click', async ()=>{
-  try{ await navigator.clipboard.writeText(eod.lastReportText||eodText.textContent||''); alert('Copied EOD to clipboard.'); }catch{ alert('Copy failed.'); }
-});
-eodExportBtn?.addEventListener('click', ()=>{
-  const payload = {
-    generatedAt: new Date().toISOString(),
-    shift, pallets: DB.load('pallets', []), staff: DB.load('staff', []),
-    backstock: DB.load('backstock', []), floor: eod.floor, eodText: eod.lastReportText
-  };
-  const blob = new Blob([ JSON.stringify(payload, null, 2) ], {type:'application/json'});
-  const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href=url; a.download='eod-report.json'; a.click(); URL.revokeObjectURL(url);
-});
 
 /*************** Reports ***************/
 const reportText = document.getElementById('reportText');
@@ -971,13 +1015,13 @@ function renderReport(){
     `Back Stock Dept Count: ${Object.keys(bsGrouped).length}`,
     '',
     '— Pallets —',
-    ...pallets.map((p,i)=>`#${i+1} ${p.type} • ${p.status}${p.overdue?' (Overdue)':''} • Cartons ${p.cartons} • Remaining ${fmtSecs(p.remaining)}`),
+    ...pallets.map((p,i)=>`#${i+1} ${p.type} • ${p.status}${p.overdue?' (Overdue)':''} • Cartons ${p.cartons} • Pieces ${p.pieces||0} • Remaining ${fmtSecs(p.remaining)}`),
     '',
     '— Recent Audits (up to 10) —',
     ...audits.slice(-10).map(a=>`${new Date(a.timestamp).toLocaleString()} — ${a.category} / ${a.subcategory} x${a.count}`),
     '',
     '— Staff —',
-    ...staff.map(s=>`${s.name} — ${s.status}${s.overdue?' (Overdue)':''} ${s.status==='Break'? '(Break '+fmtSecs(s.breakElapsed)+')' : s.status==='Lunch'? '(Lunch '+fmtSecs(s.lunchElapsed)+')' : ''} • ${s.role}${s.sub? ' / '+s.sub:''}`),
+    ...staff.map(s=>`${s.name} — ${s.status}${s.overdue?' (Overdue)':''} ${s.status==='Break'? '(Break '+fmtSecs(s.breakElapsed)+')' : s.status==='Lunch'? '(Lunch '+fmtSecs(s.lunchElapsed)+')' : ''} • ${s.role}${s.sub? ' / '+s.sub:''}${s.shiftStart? ' • Work '+new Date(s.shiftStart).toLocaleTimeString()+' – '+(s.shiftEnd? new Date(s.shiftEnd).toLocaleTimeString():'…'):''}`),
     '',
     '— Back Stock (by Department) —',
     ...(bsLines.length? bsLines : ['(none)']),
@@ -1015,7 +1059,7 @@ document.getElementById('removeEmp').addEventListener('click', ()=>{ setStaffCou
 document.getElementById('empCount').addEventListener('change', (e)=>{ setStaffCount(parseInt(e.target.value||'1',10)); e.target.value = staff.length; });
 document.getElementById('applyPreset').addEventListener('click', ()=>{ const name = document.getElementById('presetSelect').value;
   const idx = staff.findIndex(s=>s.name.startsWith('Employee '));
-  if(idx>=0){ staff[idx].name = name; } else { staff.push({ name, status:'Working', breakElapsed:0, lunchElapsed:0, overdue:false, overdueSince:null, role:'Unloading', sub:'' }); }
+  if(idx>=0){ staff[idx].name = name; } else { staff.push({ name, status:'Working', breakElapsed:0, lunchElapsed:0, overdue:false, overdueSince:null, role:'Unloading', sub:'', shiftStart:null, shiftEnd:null }); }
   DB.save('staff', staff); setStaffCount(Math.min(10, staff.length)); renderStaff();
 });
 document.getElementById('notifBtn').addEventListener('click', async ()=>{ try{ await Notification.requestPermission(); alert('Notification permission: '+Notification.permission); }catch{ alert('Notifications not available.'); }});
@@ -1023,18 +1067,73 @@ document.getElementById('muteToggle').checked = DB.load('mute', false) ? true : 
 document.getElementById('muteToggle').addEventListener('change', (e)=>{ DB.save('mute', e.target.checked); if(!e.target.checked) AudioBus.resume(); });
 document.getElementById('volSlider').value = Number(DB.load('vol','0.8'));
 document.getElementById('volSlider').addEventListener('input', (e)=> AudioBus.setVolume(Number(e.target.value)));
-document.getElementById('testBreak').addEventListener('click', ()=>{ AudioBus.resume(); AudioBus.chimeBreak(false); });
-document.getElementById('testPallet').addEventListener('click', ()=>{ AudioBus.resume(); AudioBus.chimePallet(false); });
+document.getElementById('testBreak').addEventListener('click', ()=>{ AudioBus.resume(); AudioBus.chimeBreak(true); });
+document.getElementById('testPallet').addEventListener('click', ()=>{ AudioBus.resume(); AudioBus.chimePallet(true); });
+document.getElementById('resetWorkTimes')
+  .addEventListener('click', ()=>{
+    if(confirm('Reset all staff work times and shift info?')){
+      resetAllWorkTimes();
+      staff = DB.load('staff', []); // reload cleaned staff
+      renderStaff();                // repaint UI
+      paintShiftBadge();            // refresh badge
+    }
+  });
+
+function resetAllWorkTimes(){
+  // clear per-employee work window + timers/overdue
+  let staff = DB.load('staff', []);
+  staff.forEach(s=>{
+    s.shiftStart = null;
+    s.shiftEnd   = null;
+    s.breakElapsed = 0;
+    s.lunchElapsed = 0;
+    s.status = 'Working';
+    s.overdue = false;
+    s.overdueSince = null;
+  });
+  DB.save('staff', staff);
+
+  // clear the global shift badge/times
+  clearShift();
+}
+
 
 /*************** Boot ***************/
 function boot(){
-  // Pallets
-  if(pallets.length===0){ pallets = Array.from({length:3}, (_,i)=> ({...structuredClone(palletDefaults), type: palletTypes[i%3]})); DB.save('pallets', pallets); }
+
+function boot(){
+  // --- daily auto-reset of work times ---
+  const today = new Date().toDateString();
+  const last = DB.load('lastSeenDate', '');
+  if (last !== today) {
+    resetAllWorkTimes();
+  }
+  DB.save('lastSeenDate', today);
+  // --------------------------------------
+
+  // (the rest of your existing boot logic…)
+  // Pallets: start with none
+  if(!Array.isArray(pallets)) pallets=[];
   renderPallets();
-  // Staff
-  if(staff.length===0){ staff = Array.from({length:6}, (_,i)=> ({ name:`Employee ${i+1}`, status:'Working', breakElapsed:0, lunchElapsed:0, overdue:false, overdueSince:null, role:'Unloading', sub:'' })); DB.save('staff', staff); }
+
+  // Staff: start with one …
+  // ...
+}
+  
+
+// Pallets: start with none
+  if(!Array.isArray(pallets)) pallets=[];
+  renderPallets();
+
+  // Staff: start with one
+  if(!Array.isArray(staff) || staff.length===0){
+    staff = [{ name:`Employee 1`, status:'Working', breakElapsed:0, lunchElapsed:0, overdue:false, overdueSince:null, role:'Unloading', sub:'', shiftStart:null, shiftEnd:null }];
+    DB.save('staff', staff);
+  }
   document.getElementById('empCount').value = staff.length;
+  paintPresetSelect();
   renderStaff();
+
   // Audit
   initAuditSelectors(); renderAudit();
   // Backstock
